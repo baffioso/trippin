@@ -1,38 +1,23 @@
-.App {
-  text-align: center;
+@import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
+
+html, body {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.route-info {
+  position: fixed;
+  top: 75px;
+  right: 10px;
+  width: auto;
+  height: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
   color: white;
+  font-family: 'Courier New', Courier, monospace;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.mapboxgl-ctrl-map {
+  background-image: url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23333" viewBox="-10 -10 60 60"><path d="M25 31.64V11.873L15 8.362v19.766zM34.14 5q.86 0 .86.86v25.157q0 .625-.625.783L25 35l-10-3.513-8.907 3.438-.233.078q-.862 0-.862-.86V8.987q0-.625.624-.784L15 5.005l10 3.513 8.905-3.438z"/></svg>') !important;
 }
