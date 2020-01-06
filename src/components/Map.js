@@ -63,7 +63,7 @@ const Map = () => {
             if (points.length > 0) {
                 let url = `http://165.22.200.0:5000/trip/v1/driving/12.578769,55.666729;${points.join(';')}?roundtrip=true&geometries=geojson&overview=full`
                 axios.get(url).then(res => {
-                    let distance = Math.round(res.data.trips[0].distance / 1000) / 10
+                    let distance = Math.round((res.data.trips[0].distance / 1000) * 10) / 10
                     let num = res.data.trips[0].duration / 60
                     let duration = `${Math.floor(num/60)} h ${Math.round(num % 60)} min`
 
