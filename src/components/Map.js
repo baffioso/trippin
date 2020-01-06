@@ -12,7 +12,7 @@ import "@mapbox/mapbox-gl-traffic/mapbox-gl-traffic.css"
 
 const styles = {
     width: "100vw",
-    height: "100vh",
+    height: "calc(100vh - 56px)",
     position: "absolute"
 };
 

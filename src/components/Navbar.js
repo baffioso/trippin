@@ -9,8 +9,8 @@ const useStyles = makeStyles(theme => ({
         flexGrow: 1,
     },
     appbar: {
-        backgroundColor: 'rgb(37, 167, 167)',        
-    },
+        backgroundColor: 'rgb(37, 167, 167)',
+        },
     title: {
         flexGrow: 1,
         textAlign: 'center',
