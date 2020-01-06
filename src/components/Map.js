@@ -17,8 +17,8 @@ const styles = {
 };
 
 const Map = () => {
-    const [map, setMap] = useState(null);
-    const [waypoints, setWaypoints] = useState([]);
+    const [map, setMap] = useState();
+    const [waypoints, setWaypoints] = useState();
     const [routeInfo, setRouteInfo] = useState();
     const mapContainer = useRef(null);
 
@@ -57,15 +57,17 @@ const Map = () => {
         map.addControl(draw, 'top-left');
 
         // Get drawn features and add to state
-        const updatePoints = () => {
+        const updateRoute = () => {
             let geom = draw.getAll();
             let points = geom.features.map(feat => feat.geometry.coordinates)
-
             if (points.length > 0) {
                 let url = `http://165.22.200.0:5000/trip/v1/driving/12.578769,55.666729;${points.join(';')}?roundtrip=true&geometries=geojson&overview=full`
                 axios.get(url).then(res => {
-                    let distance = Math.round(res.data.trips[0].distance / 1000)
-                    let duration = Math.round(res.data.trips[0].duration / 60)
+                    let distance = Math.round(res.data.trips[0].distance / 1000) / 10
+                    let num = res.data.trips[0].duration / 60
+                    let duration = `${Math.floor(num/60)} h ${Math.round(num % 60)} min`
+
+                    // let duration = Math.round(res.data.trips[0].duration / 60)
                     let _waypoints = res.data.waypoints.map(item => {
                         return { index: item.waypoint_index + 1, name: item.name, location: item.location }
                     })
@@ -144,13 +146,12 @@ const Map = () => {
         }
 
         // Store drawn poygon in state
-        map.on('draw.create', updatePoints);
-        map.on('draw.update', updatePoints);
-        map.on('draw.delete', updatePoints);
+        map.on('draw.create', updateRoute);
+        map.on('draw.update', updateRoute);
+        map.on('draw.delete', updateRoute);
     }
 
     const waypointHandler = location => {
-
         map.flyTo({
             center: location,
             zoom: 16
@@ -160,7 +161,7 @@ const Map = () => {
     return (
         <div ref={el => (mapContainer.current = el)} style={styles} >
             {routeInfo ? <RouteInfo distance={routeInfo.distance} duration={routeInfo.duration} /> : null}
-            {waypoints.length > 0 ? <WaypointList waypoints={waypoints} clicked={waypointHandler} /> : null}
+            {waypoints ? <WaypointList waypoints={waypoints} clicked={waypointHandler} /> : null}
         </div>
     );
 };

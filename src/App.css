@@ -8,7 +8,7 @@ html, body {
 
 .route-info {
   position: fixed;
-  top: 75px;
+  top: 66px;
   right: 10px;
   width: auto;
   height: auto;
@@ -16,6 +16,10 @@ html, body {
   padding: 10px;
   color: white;
   font-family: 'Courier New', Courier, monospace;
+}
+
+.route-info td:first-child {
+  padding-right: 7px;
 }
 
 .mapboxgl-ctrl-map {

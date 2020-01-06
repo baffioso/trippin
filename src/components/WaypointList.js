@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-import { Fab } from '@material-ui/core';
+import { Fab, Divider } from '@material-ui/core';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -10,12 +10,19 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import ListIcon from '@material-ui/icons/List';
 
 const useStyles = makeStyles({
+    header: {
+        textAlign: 'center',
+        margin: 0,
+        padding: 17,
+        color: 'white',
+        backgroundColor: 'rgb(37, 167, 167)'
+    },
     list: {
         width: 250
     },
     btn: {
         position: "fixed",
-        bottom: 80,
+        bottom: 85,
         right: 10,
         zIndex: 100,
         backgroundColor: 'rgb(37, 167, 167)'
@@ -48,6 +55,8 @@ export default function WaypointList(props) {
             onClick={toggleDrawer(side, false)}
             onKeyDown={toggleDrawer(side, false)}
         >
+            <h3 className={classes.header}>Stop på ruten</h3>
+            <Divider />
             <List>
                 {props.waypoints.sort((a, b) => (a.index > b.index) ? 1 : -1).map(item => (
                     <ListItem button key={item.index} test='hello' onClick={() => props.clicked(item.location)} >

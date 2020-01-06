@@ -11,7 +11,7 @@ const RouteInfo = (props) => {
                     </tr>
                     <tr>
                         <td>Tid</td>
-                        <td>{props.duration} min</td>
+                        <td>{props.duration}</td>
                     </tr>
                 </tbody>
             </table>
