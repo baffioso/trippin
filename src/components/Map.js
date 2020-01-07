@@ -145,10 +145,27 @@ const Map = () => {
             }
         }
 
+        const deleteRoute = () => {
+            // Remove current overlay
+            if (map.getSource('route') && map.getSource('waypoints')) {
+                map.removeLayer('route')
+                map.removeSource('route')
+                map.removeLayer('waypoints')
+                map.removeSource('waypoints')
+            }  
+            
+            setRouteInfo(null)
+            setWaypoints(null)
+
+            // deleteAll() doesn't clear inactive pouints - ugly hack
+            draw.deleteAll()
+            map.setLayoutProperty('gl-draw-point-inactive.cold', 'visibility', 'none');
+        }
+
         // Store drawn poygon in state
         map.on('draw.create', updateRoute);
         map.on('draw.update', updateRoute);
-        map.on('draw.delete', updateRoute);
+        map.on('draw.delete', deleteRoute);
     }
 
     const waypointHandler = location => {
