@@ -59,7 +59,7 @@ export default function WaypointList(props) {
             <Divider />
             <List>
                 {props.waypoints.sort((a, b) => (a.index > b.index) ? 1 : -1).map(item => (
-                    <ListItem button key={item.index} test='hello' onClick={() => props.clicked(item.location)} >
+                    <ListItem button key={item.index} onMouseEnter={() => props.entered(item)} onMouseLeave={() => props.leaved(item)} onClick={() => props.clicked(item.location)} >
                         <ListItemIcon>
                             <DeleteIcon />
                         </ListItemIcon>

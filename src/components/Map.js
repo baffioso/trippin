@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from 'react-dom'
 import mapboxgl from "mapbox-gl";
 import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import MapboxTraffic from '@mapbox/mapbox-gl-traffic'
 import axios from 'axios'
 import RouteInfo from './RouteInfo';
 import WaypointList from './WaypointList'
+import Popup from './Popup'
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css"
@@ -18,6 +20,7 @@ const styles = {
 
 const Map = () => {
     const [map, setMap] = useState();
+    const [popup, setPopup] = useState();
     const [waypoints, setWaypoints] = useState();
     const [routeInfo, setRouteInfo] = useState();
     const mapContainer = useRef(null);
@@ -39,6 +42,8 @@ const Map = () => {
 
                 addDrawControl(map)
                 map.addControl(new MapboxTraffic(), 'top-left');
+
+                map.on('click', 'waypoints', e => onMapClick(map, e));
 
             });
         };
@@ -68,14 +73,15 @@ const Map = () => {
                     let duration = `${Math.floor(num/60)} h ${Math.round(num % 60)} min`
 
                     // let duration = Math.round(res.data.trips[0].duration / 60)
-                    let _waypoints = res.data.waypoints.map(item => {
-                        return { index: item.waypoint_index + 1, name: item.name, location: item.location }
+                    let properties = res.data.waypoints.map(item => {
+                        return { ...item, index: item.waypoint_index + 1, fyldningsgrad: Math.floor(Math.random() * (80 - 100 + 1) ) + 80 }
+                        //return { index: item.waypoint_index + 1, name: item.name, location: item.location }
                     })
                     setRouteInfo({ "distance": distance, "duration": duration })
-                    setWaypoints(_waypoints)
+                    setWaypoints(properties)
 
                     let route = res.data.trips[0].geometry
-                    let stops = _waypoints.map((item) => {
+                    let stops = properties.map((item) => {
                         let feature = {
                             'type': 'Feature',
                             'geometry': {
@@ -83,7 +89,7 @@ const Map = () => {
                                 'coordinates': item.location
                             },
                             'properties': {
-                                'id': item.index
+                                ...item
                             }
                         }
 
@@ -135,7 +141,7 @@ const Map = () => {
                             // concatenate the name to get an icon from the style's sprite sheet
                             'icon-image': 'beer-15',
                             // get the title name from the source's "title" property
-                            'text-field': ['get', 'id'],
+                            'text-field': ['get', 'index'],
                             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                             'text-offset': [0, 0.6],
                             'text-anchor': 'top'
@@ -157,28 +163,70 @@ const Map = () => {
             setRouteInfo(null)
             setWaypoints(null)
 
-            // deleteAll() doesn't clear inactive pouints - ugly hack
             draw.deleteAll()
+            // deleteAll() doesn't clear inactive pouints - ugly hack
             map.setLayoutProperty('gl-draw-point-inactive.cold', 'visibility', 'none');
         }
 
-        // Store drawn poygon in state
         map.on('draw.create', updateRoute);
         map.on('draw.update', updateRoute);
         map.on('draw.delete', deleteRoute);
     }
 
-    const waypointHandler = location => {
+    const onMapClick = (map, event) => {
+        // get unique id from clicked feature
+        // let renderedFeatures = map.queryRenderedFeatures(event.point);
+        // let gid = renderedFeatures[0].properties.id;
+
+        // Higlight selected feature
+        // let features = this.map.querySourceFeatures('overlay', { filter: ['==', 'id', gid] });
+        // this._highlightFeature(features)
+
+        // Add popup
+        addPopup(map, <Popup data={event.features[0].properties} />, event.lngLat)
+
+    }
+
+    const addPopup = (map, el, lngLat) => {
+        const placeholder = document.createElement('div');
+        ReactDOM.render(el, placeholder);
+
+        let _popup = new mapboxgl.Popup({closeButton: false})
+            .setDOMContent(placeholder)
+            .setLngLat(lngLat)
+            .addTo(map);
+
+        setPopup(_popup)
+    }
+
+    const waypointListItemClick = location => {
         map.flyTo({
             center: location,
             zoom: 16
         });
     }
 
+    const waypointListItemEnter = feature => {
+        if (popup) {
+            popup.remove()
+            setPopup(null)
+        }
+
+        addPopup(map, <Popup data={feature} />, feature.location)
+        map.flyTo({
+            center: feature.location,
+        });
+    }
+
+    const waypointListItemLeave = () => {
+        popup.remove()
+        setPopup(null)
+    }
+
     return (
         <div ref={el => (mapContainer.current = el)} style={styles} >
             {routeInfo ? <RouteInfo distance={routeInfo.distance} duration={routeInfo.duration} /> : null}
-            {waypoints ? <WaypointList waypoints={waypoints} clicked={waypointHandler} /> : null}
+            {waypoints ? <WaypointList waypoints={waypoints} entered={waypointListItemEnter} leaved={waypointListItemLeave} clicked={waypointListItemClick} /> : null}
         </div>
     );
 };

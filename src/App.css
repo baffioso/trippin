@@ -22,6 +22,11 @@ html, body {
   padding-right: 7px;
 }
 
+.mapboxgl-popup-content {
+  background-color: rgb(255, 255, 255) !important;
+  padding: 0px !important;
+}
+
 .mapboxgl-ctrl-map {
   background-image: url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23333" viewBox="-10 -10 60 60"><path d="M25 31.64V11.873L15 8.362v19.766zM34.14 5q.86 0 .86.86v25.157q0 .625-.625.783L25 35l-10-3.513-8.907 3.438-.233.078q-.862 0-.862-.86V8.987q0-.625.624-.784L15 5.005l10 3.513 8.905-3.438z"/></svg>') !important;
 }
