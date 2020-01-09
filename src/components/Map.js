@@ -43,13 +43,37 @@ const Map = () => {
                 addDrawControl(map)
                 map.addControl(new MapboxTraffic(), 'top-left');
 
-                map.on('click', 'waypoints', e => onMapClick(map, e));
+                map.on('click', 'waypoints', e => {
+                    if (popup) {
+                        popup.remove();
+                        setPopup(null)
+                    }
+                    setPopup(null)
+                    map.getCanvas().style.cursor = 'pointer';
+                    addPopup(map, <Popup data={e.features[0].properties} />, e.lngLat)
+                });
+
+
+                map.on('mouseenter', 'waypoints', e => {
+                    map.getCanvas().style.cursor = 'pointer';
+
+                    // if (pop) {
+                    //     pop.remove();
+                    //     setPopup(null)
+                    // }
+                    // setPopup(null)
+                    // pop = addPopup(map, <Popup data={e.features[0].properties} />, e.lngLat)
+                });
+
+                map.on('mouseleave', 'waypoints', () => {
+                    map.getCanvas().style.cursor = '';
+                });
 
             });
         };
 
         if (!map) initializeMap({ setMap, mapContainer });
-    }, [map]);
+    }, [map, popup]);
 
     const addDrawControl = (map) => {
         let draw = new MapboxDraw({
@@ -70,12 +94,15 @@ const Map = () => {
                 axios.get(url).then(res => {
                     let distance = Math.round((res.data.trips[0].distance / 1000) * 10) / 10
                     let num = res.data.trips[0].duration / 60
-                    let duration = `${Math.floor(num/60)} h ${Math.round(num % 60)} min`
+                    let duration = `${Math.floor(num / 60)} h ${Math.round(num % 60)} min`
 
                     // let duration = Math.round(res.data.trips[0].duration / 60)
                     let properties = res.data.waypoints.map(item => {
-                        return { ...item, index: item.waypoint_index + 1, fyldningsgrad: Math.floor(Math.random() * (80 - 100 + 1) ) + 80 }
-                        //return { index: item.waypoint_index + 1, name: item.name, location: item.location }
+                        return {
+                            ...item, 
+                            index: item.waypoint_index + 1, 
+                            fyldningsgrad: Math.floor(Math.random() * (80 - 100 + 1)) + 80,
+                        }
                     })
                     setRouteInfo({ "distance": distance, "duration": duration })
                     setWaypoints(properties)
@@ -158,11 +185,11 @@ const Map = () => {
                 map.removeSource('route')
                 map.removeLayer('waypoints')
                 map.removeSource('waypoints')
-            }  
-            
+            }
+
             setRouteInfo(null)
             setWaypoints(null)
-
+            
             draw.deleteAll()
             // deleteAll() doesn't clear inactive pouints - ugly hack
             map.setLayoutProperty('gl-draw-point-inactive.cold', 'visibility', 'none');
@@ -181,7 +208,7 @@ const Map = () => {
         // Higlight selected feature
         // let features = this.map.querySourceFeatures('overlay', { filter: ['==', 'id', gid] });
         // this._highlightFeature(features)
-
+        map.getCanvas().style.cursor = 'pointer';
         // Add popup
         addPopup(map, <Popup data={event.features[0].properties} />, event.lngLat)
 
@@ -191,12 +218,14 @@ const Map = () => {
         const placeholder = document.createElement('div');
         ReactDOM.render(el, placeholder);
 
-        let _popup = new mapboxgl.Popup({closeButton: false})
+        let _popup = new mapboxgl.Popup({ closeButton: true })
             .setDOMContent(placeholder)
             .setLngLat(lngLat)
             .addTo(map);
 
         setPopup(_popup)
+
+        return _popup
     }
 
     const waypointListItemClick = location => {
@@ -213,6 +242,7 @@ const Map = () => {
         }
 
         addPopup(map, <Popup data={feature} />, feature.location)
+        
         map.flyTo({
             center: feature.location,
         });

@@ -4,10 +4,6 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import IconButton from '@material-ui/core/IconButton';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import DirectionsIcon from '@material-ui/icons/Directions';
 
@@ -38,6 +34,16 @@ const useStyles = makeStyles(theme => ({
 
 export default function Popup(props) {
     const classes = useStyles();
+    
+    let location;
+    if (typeof props.data.location === "string") {
+        location = JSON.parse(props.data.location)
+    } else {
+        location = props.data.location
+    }
+
+    let lat = location[1]
+    let lng = location[0]
 
     return (
         <div className={classes.root}>
@@ -51,7 +57,7 @@ export default function Popup(props) {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <IconButton style={{marginLeft: 'auto'}} onClick={() => navigate(JSON.parse(props.data.location)[1], JSON.parse(props.data.location)[0])} size="small"><DirectionsIcon /></IconButton>
+                    <IconButton style={{marginLeft: 'auto'}} onClick={() => window.open(`http://maps.google.com?daddr=${lat},${lng}&amp;ll=`)} size="small"><DirectionsIcon /></IconButton>
                 </CardActions>
             </Card>
         </div>
